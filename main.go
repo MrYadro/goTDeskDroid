@@ -183,11 +183,13 @@ func convertBg(filename string) {
 	back := image.NewRGBA(image.Rect(0, 0, imgsizex, imgsizey))
 
 	if istiled {
-		stepx := imgsizex / img.Bounds().Max.X
-		stepy := imgsizey / img.Bounds().Max.Y
-		for x := 0; x < stepx; x++ {
-			for y := 0; y < stepy; y++ {
-				draw.Draw(back, back.Bounds(), img, image.Point{-x, -y}, draw.Src)
+		tilesizex := img.Bounds().Max.X
+		tilesizey := img.Bounds().Max.Y
+		stepx := imgsizex / tilesizex
+		stepy := imgsizey / tilesizey
+		for x := 0; x <= stepx; x++ {
+			for y := 0; y <= stepy; y++ {
+				draw.Draw(back, back.Bounds(), img, image.Point{-x * tilesizex, -y * tilesizey}, draw.Src)
 			}
 		}
 	}
@@ -195,12 +197,12 @@ func convertBg(filename string) {
 	toimg, _ := os.Create(filename + "/converted.jpg")
 	defer toimg.Close()
 	if istiled {
-		err := jpeg.Encode(toimg, back, &jpeg.Options{100})
+		err := jpeg.Encode(toimg, back, &jpeg.Options{90})
 		if err != nil {
 			log.Fatal(err)
 		}
 	} else {
-		err := jpeg.Encode(toimg, img, &jpeg.Options{100})
+		err := jpeg.Encode(toimg, img, &jpeg.Options{90})
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -220,7 +222,6 @@ func makeAttheme(mapfile, tdesktopmap, transmap, overridemap map[string]string, 
 	}
 	defer file.Close()
 	for key, value := range mapfile {
-		trans := "ff"
 		var desktopvalue string
 		if overridemap[key] != "" {
 			desktopvalue = overridemap[key]
@@ -232,13 +233,13 @@ func makeAttheme(mapfile, tdesktopmap, transmap, overridemap map[string]string, 
 			if transmap[key] != "" {
 				color = transmap[key] + desktopvalue
 			} else {
-				color = trans + desktopvalue
+				color = desktopvalue
 			}
 		} else if len(desktopvalue) == 8 {
 			color = desktopvalue[6:] + desktopvalue[:6]
 		} else {
 			fmt.Println("Key " + mapfile[key] + " missing from .tdesktop-theme")
-			color = "ff00ff00"
+			color = "00ff00"
 		}
 		atthememap[key] = color
 	}
