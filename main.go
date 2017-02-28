@@ -141,6 +141,24 @@ func readTdesktopFile(filefolder string) map[string]string {
 	return filemap
 }
 
+func paramsToFilename(isTiled bool, isJpg bool) string {
+	var name string
+	var ext string
+	if isTiled {
+		name = "tiled"
+	} else {
+		name = "background"
+	}
+
+	if isJpg {
+		ext = ".jpg"
+	} else {
+		ext = ".png"
+	}
+
+	return name + ext
+}
+
 func convertBg(filename string) {
 	var istiled bool
 	var isjpg bool
@@ -148,22 +166,20 @@ func convertBg(filename string) {
 	if fileExists(filename + "/tiled.jpg") {
 		istiled = true
 		isjpg = true
-		fname = filename + "/tiled.jpg"
 	} else if fileExists(filename + "/tiled.png") {
 		istiled = true
 		isjpg = false
-		fname = filename + "/tiled.png"
 	} else if fileExists(filename + "/background.jpg") {
 		istiled = false
 		isjpg = true
-		fname = filename + "/background.jpg"
 	} else if fileExists(filename + "/background.png") {
 		istiled = false
 		isjpg = false
-		fname = filename + "/background.png"
 	} else {
-		fmt.Println("no bg")
+		log.Println("Bg not found")
 	}
+
+	fname = filename + "/" + paramsToFilename(istiled, isjpg)
 
 	var img image.Image
 
