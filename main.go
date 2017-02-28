@@ -257,7 +257,7 @@ func makeAttheme(mapfile, tdesktopmap, transmap, overridemap map[string]string, 
 			fmt.Println("Key " + mapfile[key] + " missing from .tdesktop-theme")
 			color = "00ff00"
 		}
-		atthememap[key] = color
+		atthememap[key] = strings.ToUpper(color)
 	}
 	if len(overridemap) != 0 {
 		for key, value := range overridemap {
